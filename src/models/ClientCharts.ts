@@ -12,11 +12,11 @@ export interface IClientChart extends Document {
     longitude: number;
     timezone?: string;
   };
-  chartData?: any;
+  chartData: any;
   createdAt: Date;
 }
 
-const ClientChartSchema = new Schema<IClientChart>({
+const ClientChartSchema = new Schema({
   name: { type: String, required: true },
   birthDate: { type: String, required: true },
   birthTime: { type: String, required: true },
@@ -28,8 +28,8 @@ const ClientChartSchema = new Schema<IClientChart>({
     longitude: Number,
     timezone: String,
   },
-  chartData: { type: Schema.Types.Mixed },
+  chartData: { type: Schema.Types.Mixed, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
-export const ClientCharts = mongoose.model<IClientChart>('ClientCharts', ClientChartSchema);
+export const ClientCharts = mongoose.model('ClientCharts', ClientChartSchema);

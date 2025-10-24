@@ -3,18 +3,23 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "dev": "tsnd --respawn src/index.ts",
+    "start": "tsx src/index.ts",
+    "dev": "tsx src/index.ts",
     "build": "tsc",
-    "serve": "node dist/index.js"
+    "serve": "node dist/index.js",
+    "test": "tsx .\\test-accuracy.mjs"
   },
   "dependencies": {
+    "ansi-colors": "^4.1.3",
     "apollo-server": "^3.4.0",
-    "graphql": "^15.6.1"
+    "graphql": "^15.6.1",
+    "luxon": "^3.7.2",
+    "mongoose": "^8.19.2",
+    "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
-    "ts-node": "^10.4.0",
-    "ts-node-dev": "^1.1.8",
+    "swisseph": "^0.5.17",
+    "tsx": "^4.20.6",
     "typescript": "^4.4.4"
   }
 }

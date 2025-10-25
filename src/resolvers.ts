@@ -1,14 +1,7 @@
-import { ClientCharts, IClientChart } from './models/ClientCharts.js';
 import { getHorizonsBirthChartPositions } from './services/horizonsService.js';
 
 export const resolvers = {
   Query: {
-    async birthChart(_: any, { id }: { id: string }) {
-      return await ClientCharts.findById(id);
-    },
-    async birthCharts() {
-      return await ClientCharts.find();
-    },
     async planetaryPositions(_: any, { date, time, latitude, longitude, bodies }: { date: string; time: string; latitude: number; longitude: number; bodies: string[] }) {
       // Here you would call the function from horizonsService to get positions
       // For example:
@@ -18,13 +11,13 @@ export const resolvers = {
     },
   },
   Mutation: {
-    async createClientChart(_: any, input: IClientChart) {
-      const chart = new ClientCharts(input);
-      await chart.save();
-      return chart;
-    },
-    async deleteClientChart(_: any, { id }: { id: string }) {
-      return await ClientCharts.findByIdAndDelete(id);
-    },
+    // async createClientChart(_: any, input: IClientChart) {
+    //   const chart = new ClientCharts(input);
+    //   await chart.save();
+    //   return chart;
+    // },
+    // async deleteClientChart(_: any, { id }: { id: string }) {
+    //   return await ClientCharts.findByIdAndDelete(id);
+    // },
   },
 };

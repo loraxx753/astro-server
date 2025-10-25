@@ -57,7 +57,6 @@ const HORIZONS_IDS: Record<string, string> = {
 export async function fetchHorizonsPositions(options: HorizonsRequestOptions): Promise<HorizonsPlanetPosition[]> {
   const results: HorizonsPlanetPosition[] = [];
   for (const body of options.bodies) {
-    console.log(options.date, options.time, body);
     const id = HORIZONS_IDS[body];
     if (!id) continue;
     // Calculate STOP_TIME as 1 minute after START_TIME
@@ -107,7 +106,7 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
       // Only use Luxon for AD dates
       let startStrFallback, stopStrFallback;
       try {
-        const localStart = DateTime.fromFormat(`${options.date} ${options.time}`, 'yyyy-MM-dd HH:mm:ss', { zone });
+        const localStart = DateTime.fromFormat(`${options.date} ${options.time}`, 'yyyy-MM-dd HH:mm', { zone });
         const localStop = localStart.plus({ minutes: 1 });
         startStrFallback = localStart.toUTC().toFormat('yyyy-MMM-dd HH:mm');
         stopStrFallback = localStop.toUTC().toFormat('yyyy-MMM-dd HH:mm');
@@ -125,7 +124,10 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
     }
 
     const block = json.result.match(/\$\$SOE([\s\S]*?)\$\$EOE/);
+
     if (!block) {
+      console.log(`${options.date} ${options.time}`);
+      console.log({json});
       throw new Error("No data section");
     }
 

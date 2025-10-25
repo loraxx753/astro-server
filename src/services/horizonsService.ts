@@ -1,4 +1,4 @@
-import { raDecToEclipticOfDate, jdTTfromUTC, jdUTC } from '../utils';
+import { raDecToEclipticOfDate, jdTTfromUTC, jdUTC } from '../utils.js';
 import { DateTime } from 'luxon';
 import tz_lookup from 'tz-lookup';
 

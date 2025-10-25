@@ -1,5 +1,5 @@
-import { ClientCharts, IClientChart } from './models/ClientCharts';
-import { getHorizonsBirthChartPositions } from './services/horizonsService';
+import { ClientCharts, IClientChart } from './models/ClientCharts.js';
+import { getHorizonsBirthChartPositions } from './services/horizonsService.js';
 
 export const resolvers = {
   Query: {

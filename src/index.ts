@@ -1,8 +1,8 @@
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from '@apollo/server/standalone';
-import typeDefs from "./schemas/typeDefs";
-import { resolvers } from "./resolvers";
+import typeDefs from "./schemas/typeDefs.js";
+import { resolvers } from "./resolvers.js";
 import mongoose from 'mongoose';
+import { startStandaloneServer } from "@apollo/server/standalone";
 
 const server = new ApolloServer({ typeDefs, resolvers });
 

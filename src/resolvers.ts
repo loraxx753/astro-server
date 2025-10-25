@@ -1,4 +1,5 @@
 import { ClientCharts, IClientChart } from './models/ClientCharts';
+import { getHorizonsBirthChartPositions } from './services/horizonsService';
 
 export const resolvers = {
   Query: {
@@ -7,6 +8,13 @@ export const resolvers = {
     },
     async birthCharts() {
       return await ClientCharts.find();
+    },
+    async planetaryPositions(_: any, { date, time, latitude, longitude, bodies }: { date: string; time: string; latitude: number; longitude: number; bodies: string[] }) {
+      // Here you would call the function from horizonsService to get positions
+      // For example:
+      const positions = await getHorizonsBirthChartPositions(date, time, latitude, longitude, bodies);
+      console.log(positions)
+      return positions;
     },
   },
   Mutation: {

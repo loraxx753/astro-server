@@ -11,49 +11,45 @@ import swisseph from 'swisseph';
 const referenceData = [
   {
     name: "Kevin Baugh Test Case",
-    birthdate: "1984-08-18",
-    birthtime: "08:03:00",
+    date: "1984-08-18",
+    time: "08:03:00",
     latitude: 28.078611,
     longitude: -80.602778,
-    date: null, // will be set below
-    timezone: null // will be set below
+    bodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
   },
   {
     name: "Simran Gill Test Case",
-    birthdate: "1991-02-16",
-    birthtime: "06:10:00",
+    date: "1991-02-16",
+    time: "06:10:00",
     latitude: 30.266944,
     longitude: -97.742778,
-    date: null, // will be set below
-    timezone: null // will be set below
+    bodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
   },
-  {
-    name: "Albert Einstein Test Case",
-    birthdate: "1879-03-14",
-    birthtime: "11:30:00",
-    latitude: 48.1351,
-    longitude: 11.5820,
-    date: null, // will be set below
-    timezone: null // will be set below
-  }
-  ,
-  {
-    name: "US Founding Test Case",
-    birthdate: "1776-07-04",
-    birthtime: "12:00:00",
-    latitude: 39.9526, // Philadelphia, PA
-    longitude: -75.1652,
-    date: null, // will be set below
-    timezone: null // will be set below
-  },
+  // {
+  //   name: "Albert Einstein Test Case",
+  //   date: "1879-03-14",
+  //   time: "11:30:00",
+  //   latitude: 48.1351,
+  //   longitude: 11.5820,
+  //   bodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
+  // },
+  // {
+  //   name: "US Founding Test Case",
+  //   date: "1776-07-04",
+  //   time: "12:00:00",
+  //   latitude: 39.9526, // Philadelphia, PA
+  //   longitude: -75.1652,
+  //   bodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
+  // },
 
 ];
 
 // Set date and timezone for each test case
 for (const testCase of referenceData) {
+
   testCase.timezone = tzLookup(testCase.latitude, testCase.longitude);
-  // Local time as Luxon DateTime object
-  testCase.localDateTime = DateTime.fromISO(`${testCase.birthdate}T${testCase.birthtime}`, { zone: testCase.timezone });
+  // Local time as Luxon DateTime objectt5 3f
+  testCase.localDateTime = DateTime.fromFormat(`${testCase.date} ${testCase.time}`, 'yyyy-MM-dd HH:mm:ss', { zone: testCase.timezone });
   // UTC JS Date for Swiss Ephemeris
   testCase.utcDateTime = testCase.localDateTime.toUTC().toJSDate();
 }
@@ -132,16 +128,18 @@ async function runAccuracyTest() {
 
   for (const testCase of referenceData) {
     console.log(`\n📊 Testing: ${testCase.name}`);
-    console.log(`Date (input): ${testCase.localDateTime.toFormat('yyyy-MM-dd')}`);
+    console.log(`Date (input): ${testCase.date} ${testCase.time} (${testCase?.timezone})`);
     console.log(`Location: ${testCase.latitude}°, ${testCase.longitude}°\n`);
 
     // Use localDateTime for HORIZONS request
-    const localString = testCase.localDateTime.toFormat('yyyy-MM-dd HH:mm:ss');
-    console.log('HORIZONS request datetime (local for observer):', localString);
+    // const localString = testCase.localDateTime.toFormat('yyyy-MM-dd HH:mm:ss');
+    // console.log('HORIZONS request datetime (local for observer):', localString);
+
 
     // Request all planets from HORIZONS using local time
     const horizonsPositions = await getHorizonsBirthChartPositions(
-      localString,
+      testCase.date,
+      testCase.time,
       testCase.latitude,
       testCase.longitude,
       ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']

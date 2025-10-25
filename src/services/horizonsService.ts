@@ -4,13 +4,15 @@ import tz_lookup from 'tz-lookup';
 
 // Alias for birth chart usage
 export async function getHorizonsBirthChartPositions(
-  datetime: string,
+  date: string,
+  time: string,
   latitude: number,
   longitude: number,
   bodies: string[]
 ): Promise<HorizonsPlanetPosition[]> {
   return await fetchHorizonsPositions({
-    datetime,
+    date,
+    time,
     location: { lat: latitude, lon: longitude },
     bodies,
   });
@@ -31,7 +33,8 @@ export interface HorizonsPlanetPosition {
 }
 
 export interface HorizonsRequestOptions {
-  datetime: string; // ISO string
+  date: string; // ISO string
+  time: string; // ISO string
   location: { lat: number; lon: number };
   bodies: string[]; // e.g., ['Mercury', 'Venus', 'Mars']
 }
@@ -54,6 +57,7 @@ const HORIZONS_IDS: Record<string, string> = {
 export async function fetchHorizonsPositions(options: HorizonsRequestOptions): Promise<HorizonsPlanetPosition[]> {
   const results: HorizonsPlanetPosition[] = [];
   for (const body of options.bodies) {
+    console.log(options.date, options.time, body);
     const id = HORIZONS_IDS[body];
     if (!id) continue;
     // Calculate STOP_TIME as 1 minute after START_TIME
@@ -61,17 +65,17 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
     const zone = tz_lookup(options.location.lat, options.location.lon);
     // Parse options.datetime as local time in the observer's timezone
     let startStr, stopStr;
-    // Detect BCE format: if options.datetime starts with 'bc '
-    if (options.datetime.startsWith('bc ')) {
+    // Detect BCE format: if options.date starts with 'bc '
+    if (options.date.startsWith('bc ')) {
       // For BCE, use the string directly, and increment minute for stopStr
-      const match = options.datetime.match(/^bc (\d{4})-([A-Za-z]{3})-(\d{2}) (\d{2}):(\d{2})$/);
+      const match = options.date.match(/^bc (\d{4})-([A-Za-z]{3})-(\d{2}) (\d{2}):(\d{2})$/);
       if (match) {
         const year = match[1];
         const month = match[2];
         const day = match[3];
         const hour = parseInt(match[4], 10);
         const minute = parseInt(match[5], 10);
-        startStr = options.datetime;
+        startStr = `${options.date} ${options.time}`;
         // Increment minute for stopStr manually
         let stopHour = hour, stopMinute = minute + 1;
         if (stopMinute >= 60) {
@@ -84,7 +88,7 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
       }
       // SKIP Luxon for BCE
     } else {
-      const localStart = DateTime.fromFormat(options.datetime, 'yyyy-MM-dd HH:mm:ss', { zone });
+      const localStart = DateTime.fromFormat(`${options.date} ${options.time}`, 'yyyy-MM-dd HH:mm:ss', { zone });
       const localStop = localStart.plus({ minutes: 1 });
       startStr = localStart.toUTC().toFormat('yyyy-MM-dd HH:mm:ss');
       stopStr = localStop.toUTC().toFormat('yyyy-MM-dd HH:mm:ss');
@@ -99,11 +103,11 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
     }
 
     // Fallback if date cannot be interpreted (only for AD dates, skip for BCE)
-    if (json.result && json.result.includes('Cannot interpret date') && !options.datetime.startsWith('bc ')) {
+    if (json.result && json.result.includes('Cannot interpret date') && !options.date.startsWith('bc ')) {
       // Only use Luxon for AD dates
       let startStrFallback, stopStrFallback;
       try {
-        const localStart = DateTime.fromFormat(options.datetime, 'yyyy-MM-dd HH:mm:ss', { zone });
+        const localStart = DateTime.fromFormat(`${options.date} ${options.time}`, 'yyyy-MM-dd HH:mm:ss', { zone });
         const localStop = localStart.plus({ minutes: 1 });
         startStrFallback = localStart.toUTC().toFormat('yyyy-MMM-dd HH:mm');
         stopStrFallback = localStop.toUTC().toFormat('yyyy-MMM-dd HH:mm');
@@ -122,7 +126,6 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
 
     const block = json.result.match(/\$\$SOE([\s\S]*?)\$\$EOE/);
     if (!block) {
-      console.log(json.result);
       throw new Error("No data section");
     }
 

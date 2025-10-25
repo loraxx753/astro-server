@@ -126,19 +126,15 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
     const block = json.result.match(/\$\$SOE([\s\S]*?)\$\$EOE/);
 
     if (!block) {
-      console.log(`${options.date} ${options.time}`);
-      console.log({json});
       throw new Error("No data section");
     }
 
     const lines = block[1].trim().split('\n').filter(Boolean);
-    for (const line of lines) {
-      const cols = line.split(',').map((s:string) => s.trim());
-
+    if (lines.length > 0) {
+      const cols = lines[0].split(',').map((s:string) => s.trim());
       const dateStr = cols[0];
       const raApp   = parseFloat(cols[5]);
       const decApp  = parseFloat(cols[6]);
-
       const jdInUTC = jdUTC(new Date(dateStr));
       const jdTT = jdTTfromUTC(jdInUTC, 69); // approx. delta T
       const { lon, lat } = raDecToEclipticOfDate(raApp, decApp, jdTT);

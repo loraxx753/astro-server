@@ -21,6 +21,10 @@ export async function getHorizonsBirthChartPositions(
 // Fetches planetary positions from NASA HORIZONS and returns them for astrological calculations.
 // This is a basic scaffold. You can expand error handling, caching, and support for more bodies as needed.
 
+interface NodeLongitudes {
+  northNodeLongitude: number;
+  southNodeLongitude: number;
+}
 
 export interface HorizonsPlanetPosition {
   name: string;
@@ -30,7 +34,9 @@ export interface HorizonsPlanetPosition {
   ra: number;        // degrees, apparent RA
   dec: number;       // degrees, apparent Dec
   dateStr: string;   // timestamp string from HORIZONS
-}
+  northNodeLongitude?: number;
+  southNodeLongitude?: number;
+};
 
 export interface HorizonsRequestOptions {
   date: string; // ISO string
@@ -54,19 +60,21 @@ const HORIZONS_IDS: Record<string, string> = {
   Moon: '301',
 };
 
+
+
 export async function fetchHorizonsPositions(options: HorizonsRequestOptions): Promise<HorizonsPlanetPosition[]> {
   const results: HorizonsPlanetPosition[] = [];
+  const nodeLongitudes: Record<string, number> = {};
+
   for (const body of options.bodies) {
     const id = HORIZONS_IDS[body];
     if (!id) continue;
     // Calculate STOP_TIME as 1 minute after START_TIME
     // Use tz-lookup to get IANA timezone from lat/lon
     const zone = tz_lookup(options.location.lat, options.location.lon);
-    // Parse options.datetime as local time in the observer's timezone
     let startStr, stopStr;
-    // Detect BCE format: if options.date starts with 'bc '
     if (options.date.startsWith('bc ')) {
-      // For BCE, use the string directly, and increment minute for stopStr
+      // For BCE, use the string directly, and increment minute for stopStr manually
       const match = options.date.match(/^bc (\d{4})-([A-Za-z]{3})-(\d{2}) (\d{2}):(\d{2})$/);
       if (match) {
         const year = match[1];
@@ -123,12 +131,36 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
       }
     }
 
-    const block = json.result.match(/\$\$SOE([\s\S]*?)\$\$EOE/);
+    // For the Moon, also fetch orbital elements to get the node
+    let northNodeLongitude: number | undefined = undefined;
+    let southNodeLongitude: number | undefined = undefined;
+    if (body === 'Moon') {
+      let startStrFallback, stopStrFallback;
+      const localStart = DateTime.fromFormat(`${options.date} ${options.time}`, 'yyyy-MM-dd HH:mm', { zone });
+      const localStop = localStart.plus({ minutes: 1 });
+      startStrFallback = localStart.toUTC().toFormat('yyyy-MMM-dd HH:mm');
+      stopStrFallback = localStop.toUTC().toFormat('yyyy-MMM-dd HH:mm');
 
+      // Fetch orbital elements for the Moon
+      const elementsUrl = `https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='301'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@399'&START_TIME='${startStrFallback}'&STOP_TIME='${stopStrFallback}'&STEP_SIZE='1 m'&ANG_FORMAT='DEG'`;
+      try {
+        const elementsResp = await fetch(elementsUrl);
+        const elementsText = await elementsResp.text();
+        // Look for 'Node =' in the text (ascending node longitude)
+        const nodeMatch = elementsText.match(/OM=\s*([\d.Ee+-]+)/);
+        if (nodeMatch) {
+          nodeLongitudes.northNodeLongitude = parseFloat(nodeMatch[1]);
+          nodeLongitudes.southNodeLongitude = (nodeLongitudes.northNodeLongitude + 180) % 360;
+        }
+      } catch (err) {
+        // If orbital elements fetch fails, skip node
+      }
+    }
+
+    const block = json.result.match(/\$\$SOE([\s\S]*?)\$\$EOE/);
     if (!block) {
       throw new Error("No data section");
     }
-
     const lines = block[1].trim().split('\n').filter(Boolean);
     if (lines.length > 0) {
       const cols = lines[0].split(',').map((s:string) => s.trim());
@@ -138,7 +170,17 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
       const jdInUTC = jdUTC(new Date(dateStr));
       const jdTT = jdTTfromUTC(jdInUTC, 69); // approx. delta T
       const { lon, lat } = raDecToEclipticOfDate(raApp, decApp, jdTT);
-      results.push({ name: body, ra: raApp, dec: decApp, longitude: lon, latitude: lat, dateStr });
+      const result: HorizonsPlanetPosition = {
+        name: body,
+        ra: raApp,
+        dec: decApp,
+        longitude: lon,
+        latitude: lat,
+        dateStr,
+        northNodeLongitude: nodeLongitudes.northNodeLongitude,
+        southNodeLongitude: nodeLongitudes.southNodeLongitude,
+      };
+      results.push(result);
     }
   }
   return results;

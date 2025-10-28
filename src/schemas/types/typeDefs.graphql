@@ -12,9 +12,6 @@ type Location {
   city: String
   country: String
   state: String
-  latitude: Float!
-  longitude: Float!
-  timezone: String
 }
 
 scalar JSON
@@ -22,7 +19,9 @@ scalar JSON
 type Query {
   birthChart(id: ID!): ClientChart
   birthCharts: [ClientChart!]
-  planetaryPositions(date: String!, time: String!, latitude: Float!, longitude: Float!, bodies: [String!]!): [CelestialBodyPosition!]!
+  planetaryPositions(date: String!, time: String!, latitude: Float, longitude: Float, city: String, region: String, country: String, bodies: [String!]!): [CelestialBodyPosition!]!
+  latLongFromLocation(city: String!, country: String!, region: String): LatLongResult!
+  locationFromLatLong(latitude: Float!, longitude: Float!): Location!
 }
 
 type Mutation {
@@ -86,4 +85,13 @@ type CelestialBodyPosition {
     longitude: Float!
     latitude: Float!
     dateStr: String!
+    northNodeLongitude: Float
+    southNodeLongitude: Float
+}
+
+type LatLongResult {
+  latitude: Float!
+  longitude: Float!
+  formattedAddress: String
+  confidence: Float
 }

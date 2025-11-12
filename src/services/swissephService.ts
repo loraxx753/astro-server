@@ -7,12 +7,6 @@ export async function getSwissEphHouses(
     latitude: number,
     longitude: number
 ): Promise<any> {
-    console.log(jd,
-            latitude,
-            longitude,
-            "P",
-)
-
         return swisseph.swe_houses(
             jd,
             latitude,

@@ -25,7 +25,7 @@ export const resolvers = {
         throw new Error(error instanceof Error ? error.message : 'Geocoding failed');
       }
     },
-    async planetaryPositions(_: any, { date, time, latitude, longitude, city, region, country, bodies }: { date: string; time: string; latitude?: number; longitude?: number; city?: string; region?: string; country?: string; bodies: string[] }) {
+    async planetaryPositions(_: any, { date, time, latitude, longitude, city, region, country }: { date: string; time: string; latitude?: number; longitude?: number; city?: string; region?: string; country?: string; }) {
       if(!latitude || !longitude) {
         // If lat/long not provided, attempt to geocode from city/country/region
         if(city && country) {
@@ -36,7 +36,7 @@ export const resolvers = {
           throw new Error('Either latitude/longitude or city/country must be provided');
         }
       }
-      return await getHorizonsBirthChartPositions(date, time, latitude, longitude, bodies);
+      return await getHorizonsBirthChartPositions(date, time, latitude, longitude);
     },
     async locationFromLatLong(_: any, { latitude, longitude }: { latitude: number; longitude: number }) {
       try {

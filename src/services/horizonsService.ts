@@ -8,13 +8,11 @@ export async function getHorizonsBirthChartPositions(
   time: string,
   latitude: number,
   longitude: number,
-  bodies: string[]
 ): Promise<HorizonsPlanetPosition[]> {
   return await fetchHorizonsPositions({
     date,
     time,
     location: { lat: latitude, lon: longitude },
-    bodies,
   });
 }
 // horizonsService.ts
@@ -42,22 +40,25 @@ export interface HorizonsRequestOptions {
   date: string; // ISO string
   time: string; // ISO string
   location: { lat: number; lon: number };
-  bodies: string[]; // e.g., ['Mercury', 'Venus', 'Mars']
 }
 
 // Map planet names to HORIZONS IDs
 const HORIZONS_IDS: Record<string, string> = {
+  Sun: '10',
+  Moon: '301',
   Mercury: '199',
   Venus: '299',
-  Earth: '399',
   Mars: '499',
   Jupiter: '599',
   Saturn: '699',
   Uranus: '799',
   Neptune: '899',
   Pluto: '999',
-  Sun: '10',
-  Moon: '301',
+  Ceres: '1',
+  Pallas: '2',
+  // Juno: '3',
+  Vesta: '4',
+  Chiron: '2060',
 };
 
 
@@ -66,7 +67,7 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
   const results: HorizonsPlanetPosition[] = [];
   const nodeLongitudes: Record<string, number> = {};
 
-  for (const body of options.bodies) {
+  for (const body of Object.keys(HORIZONS_IDS)) {
     const id = HORIZONS_IDS[body];
     if (!id) continue;
     // Calculate STOP_TIME as 1 minute after START_TIME
@@ -141,7 +142,7 @@ export async function fetchHorizonsPositions(options: HorizonsRequestOptions): P
       startStrFallback = localStart.toUTC().toFormat('yyyy-MMM-dd HH:mm');
       stopStrFallback = localStop.toUTC().toFormat('yyyy-MMM-dd HH:mm');
 
-      // Fetch orbital elements for the Moon
+      // Fetch orbital elements for the body to get node longitude
       const elementsUrl = `https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='301'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@399'&START_TIME='${startStrFallback}'&STOP_TIME='${stopStrFallback}'&STEP_SIZE='1 m'&ANG_FORMAT='DEG'`;
       try {
         const elementsResp = await fetch(elementsUrl);

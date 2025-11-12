@@ -31,7 +31,7 @@ type HousePositionsResult {
 type Query {
   birthChart(id: ID!): ClientChart
   birthCharts: [ClientChart!]
-  planetaryPositions(date: String!, time: String!, latitude: Float, longitude: Float, city: String, region: String, country: String, bodies: [String!]!): [CelestialBodyPosition!]!
+  planetaryPositions(date: String!, time: String!, latitude: Float, longitude: Float, city: String, region: String, country: String): [CelestialBodyPosition!]!
   latLongFromLocation(city: String!, country: String!, region: String): LatLongResult!
   locationFromLatLong(latitude: Float!, longitude: Float!): Location!
   housePositions(date: String!, time: String!, latitude: Float!, longitude: Float!): HousePositionsResult!

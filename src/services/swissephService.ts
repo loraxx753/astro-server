@@ -6,7 +6,7 @@ export async function getSwissEphHouses(
     jd: number,
     latitude: number,
     longitude: number
-): any {
+): Promise<any> {
     console.log(jd,
             latitude,
             longitude,

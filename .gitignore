@@ -1,5 +1,6 @@
 # Ignore the compiled output.
 dist/
+ephe/
 .env
 
 # TypeScript incremental compilation cache

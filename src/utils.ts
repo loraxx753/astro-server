@@ -96,3 +96,17 @@ export function raDecToEclipticOfDate(
 export function jdTTfromUTC(jdUtc: number, deltaT_sec: number): number {
   return jdUtc + deltaT_sec / 86400.0;
 }
+
+export const convertToZodiac = (degrees: number) => {
+    const signs = [
+    'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+    'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    ];
+    const d = ((degrees % 360) + 360) % 360;
+    const signIndex = Math.floor(d / 30);
+    const sign = signs[signIndex];
+    const degree = Math.floor(d % 30);
+    const minutes = Math.floor((d % 1) * 60);
+    const seconds = Math.round((((d % 1) * 60) - minutes) * 60);
+    return { sign, degree, minutes, seconds };
+}

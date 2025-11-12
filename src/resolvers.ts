@@ -1,6 +1,12 @@
 import { getHorizonsBirthChartPositions } from './services/horizonsService.js';
 import { geocodeLocation } from './services/geocoding.js';
 import { reverseGeocode } from './services/geocoding.js';
+import {getPlacidusCusps, getJulianDay, getSwissEphHouses} from './services/swissephService.js';
+import swisseph from 'swisseph';
+import tzLookup from 'tz-lookup';
+import { DateTime } from 'luxon';
+
+
 
 export const resolvers = {
   Query: {
@@ -44,6 +50,19 @@ export const resolvers = {
         throw new Error(error instanceof Error ? error.message : 'Reverse geocoding failed');
       }
     },
+    async housePositions(_: any, { date, time, latitude, longitude }: { date: string; time: string; latitude: number; longitude: number; }) {
+    const timezone = tzLookup(latitude, longitude);
+    const localDateTime = DateTime.fromFormat(`${date} ${time}`, 'yyyy-MM-dd HH:mm', { zone: timezone });
+    const utcDateTime = localDateTime.toUTC();
+    const jd = swisseph.swe_julday(
+      utcDateTime.year,
+      utcDateTime.month,
+      utcDateTime.day,
+      utcDateTime.hour + utcDateTime.minute / 60 + utcDateTime.second / 3600,
+      swisseph.SE_GREG_CAL
+    );
+      return await getSwissEphHouses(jd, latitude, longitude);
+    }
   },
   Mutation: {
     // async createClientChart(_: any, input: IClientChart) {

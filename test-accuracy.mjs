@@ -17,14 +17,14 @@ const referenceData = [
     longitude: -80.602778,
     bodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
   },
-  {
-    name: "Simran Gill Test Case",
-    date: "1991-02-16",
-    time: "06:10:00",
-    latitude: 30.266944,
-    longitude: -97.742778,
-    bodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
-  },
+  // {
+  //   name: "Simran Gill Test Case",
+  //   date: "1991-02-16",
+  //   time: "06:10:00",
+  //   latitude: 30.266944,
+  //   longitude: -97.742778,
+  //   bodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
+  // },
   // {
   //   name: "Albert Einstein Test Case",
   //   date: "1879-03-14",
@@ -80,6 +80,15 @@ const PLANET_MAP = {
   saturn: swisseph.SE_SATURN
 };
 
+async function getSwissEphHouses(jd, latitude, longitude) {
+  return new Promise((resolve, reject) => {
+    swisseph.swe_houses(jd, latitude, longitude, swisseph.SE_PLACIDUS, (res) => {
+      if (res.error) reject(res.error);
+      else resolve(res.house);
+    });
+  });
+}
+
 // Helper: get Julian Day in UT
 function getJulianDay(date) {
   // swisseph expects Julian Day in UT
@@ -120,6 +129,29 @@ async function getSwissephLongitude(jd, planet) {
 function getLocalTimeWithTimezone(date, timezone) {
   // Use Luxon to convert UTC JS Date to local time in the given IANA timezone
   return DateTime.fromJSDate(date, { zone: 'utc' }).setZone(timezone);
+}
+
+/**
+ * Convert a JS Date to decimal year (fractional year, precise to second).
+ * @param {Date} date
+ * @returns {number} decimal year
+ */
+export function dateToDecimalYear(date) {
+  const year = date.getUTCFullYear();
+  // Day of year (1-based)
+  const start = new Date(Date.UTC(year, 0, 1));
+  const diff = date - start;
+  const dayOfYear = Math.floor(diff / 86400000) + 1;
+  // Total days in year (accounts for leap years)
+  const nextYear = new Date(Date.UTC(year + 1, 0, 1));
+  const daysInYear = (nextYear - start) / 86400000;
+  // Fractional day
+  const hour = date.getUTCHours();
+  const min = date.getUTCMinutes();
+  const sec = date.getUTCSeconds();
+  const ms = date.getUTCMilliseconds();
+  const fracDay = (hour + (min + (sec + ms / 1000) / 60) / 60) / 24;
+  return year + ((dayOfYear - 1 + fracDay) / daysInYear);
 }
 
 async function runAccuracyTest() {
@@ -170,6 +202,8 @@ async function runAccuracyTest() {
       air: colors.cyan.bold,
       water: colors.blue.bold
     };
+
+    let planetaryPositions = []
 
     const planetData = {
       Sun: { unicode: '☉', color: colors.yellow.bold },

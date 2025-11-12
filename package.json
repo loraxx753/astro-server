@@ -8,7 +8,8 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "serve": "node dist/index.js",
-    "test": "tsx .\\test-accuracy.mjs"
+    "test": "tsx .\\test-accuracy.mjs",
+    "test:houses": "tsx .\\test-houses.mjs"
   },
   "dependencies": {
     "@apollo/server": "^5.0.0",

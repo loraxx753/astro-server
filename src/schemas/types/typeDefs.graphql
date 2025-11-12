@@ -16,12 +16,25 @@ type Location {
 
 scalar JSON
 
+type HousePositionsResult {
+  house: [Float!]!
+  ascendant: Float!
+  mc: Float!
+  armc: Float!
+  vertex: Float!
+  equatorialAscendant: Float!
+  kochCoAscendant: Float!
+  munkaseyCoAscendant: Float!
+  munkaseyPolarAscendant: Float!
+}
+
 type Query {
   birthChart(id: ID!): ClientChart
   birthCharts: [ClientChart!]
   planetaryPositions(date: String!, time: String!, latitude: Float, longitude: Float, city: String, region: String, country: String, bodies: [String!]!): [CelestialBodyPosition!]!
   latLongFromLocation(city: String!, country: String!, region: String): LatLongResult!
   locationFromLatLong(latitude: Float!, longitude: Float!): Location!
+  housePositions(date: String!, time: String!, latitude: Float!, longitude: Float!): HousePositionsResult!
 }
 
 type Mutation {
@@ -95,3 +108,4 @@ type LatLongResult {
   formattedAddress: String
   confidence: Float
 }
+

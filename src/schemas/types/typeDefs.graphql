@@ -16,6 +16,16 @@ type Location {
 
 scalar JSON
 
+type Planet {
+  name: String!
+  houseNumber: Int!
+}
+
+type HouseResults {
+  houses: [House!]!
+  planets: [Planet!]!
+}
+
 type HousePositionsResult {
   house: [Float!]!
   ascendant: Float!

@@ -1,7 +1,7 @@
 import { getHorizonsBirthChartPositions } from './services/horizonsService.js';
 import { geocodeLocation } from './services/geocoding.js';
 import { reverseGeocode } from './services/geocoding.js';
-import {getPlacidusCusps, getJulianDay, getSwissEphHouses} from './services/swissephService.js';
+import {getPlacidusCusps, getPlanetsInHouses, getSwissEphHouses} from './services/swissephService.js';
 import swisseph from 'swisseph';
 import tzLookup from 'tz-lookup';
 import { DateTime } from 'luxon';

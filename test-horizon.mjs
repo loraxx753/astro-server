@@ -263,5 +263,4 @@ async function runAccuracyTest() {
 }
 
 // Run the test
-// runAccuracyTest().catch(console.error);
-
+runAccuracyTest().catch(console.error);

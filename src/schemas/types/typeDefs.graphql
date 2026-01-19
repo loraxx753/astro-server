@@ -1,5 +1,6 @@
 type ClientChart {
   id: ID!
+  uid: String!
   name: String!
   birthDate: String!
   birthTime: String!
@@ -9,6 +10,8 @@ type ClientChart {
 }
 
 type Location {
+  latitude: Float!
+  longitude: Float!
   city: String
   country: String
   state: String
@@ -39,12 +42,12 @@ type HousePositionsResult {
 }
 
 type Query {
-  birthChart(id: ID!): ClientChart
+  birthChart(uid: String!): ClientChart
   birthCharts: [ClientChart!]
-  planetaryPositions(date: String!, time: String!, latitude: Float, longitude: Float, city: String, region: String, country: String): [CelestialBodyPosition!]!
+  planetaryPositions(uid: String!, name: String, date: String, time: String, latitude: Float, longitude: Float, city: String, region: String, country: String): [CelestialBodyPosition!]!
   latLongFromLocation(city: String!, country: String!, region: String): LatLongResult!
   locationFromLatLong(latitude: Float!, longitude: Float!): Location!
-  housePositions(date: String!, time: String!, latitude: Float!, longitude: Float!): HousePositionsResult!
+  housePositions(uid: String!, date: String!, time: String!, latitude: Float!, longitude: Float!): HousePositionsResult!
 }
 
 type Mutation {

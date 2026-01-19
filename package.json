@@ -26,7 +26,7 @@
     "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
-    "@types/node": "^24.9.1",
+    "@types/node": "^24.10.8",
     "@types/tz-lookup": "^6.1.2",
     "swisseph": "^0.5.17",
     "tsx": "^4.20.6",

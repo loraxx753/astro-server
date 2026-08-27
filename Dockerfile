@@ -16,7 +16,10 @@ COPY tsconfig.json ./
 COPY src ./src
 
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
 
 EXPOSE 7004
 
-CMD ["npx", "tsx", "src/index.ts"]
+# Use the local tsx loader. npx can hang/fail at runtime, and a Railway
+# dashboard start command of `yarn start` would miss Yarn in this image.
+CMD ["node", "--import", "tsx", "src/index.ts"]

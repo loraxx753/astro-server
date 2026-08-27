@@ -6,6 +6,11 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const typeDefsArray = loadFilesSync(path.join(__dirname, '..', 'schemas', 'types', '*.graphql'), { extensions: ['graphql'] });
+const schemaGlob = path.join(__dirname, "types", "*.graphql");
+const typeDefsArray = loadFilesSync(schemaGlob, { extensions: ["graphql"] });
+
+if (!typeDefsArray.length) {
+  throw new Error(`No GraphQL schema files found at ${schemaGlob}`);
+}
 
 export default mergeTypeDefs(typeDefsArray);

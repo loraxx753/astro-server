@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "packages": {
+    "python": "3.11"
+  },
+  "buildAptPackages": ["build-essential", "python3-pip"],
+  "steps": {
+    "install": {
+      "variables": {
+        "PYTHON": "python3"
+      },
+      "commands": [
+        {
+          "cmd": "python3 -m pip install --break-system-packages 'setuptools<81'",
+          "customName": "Restore distutils for node-gyp"
+        },
+        "..."
+      ]
+    }
+  }
+}

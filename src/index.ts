@@ -12,8 +12,10 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 
 const server = new ApolloServer({ typeDefs, resolvers });
 
+const port = Number(process.env.PORT) || 7004;
 
-// Start the server
-startStandaloneServer(server, { listen: { port: 7004 } }).then(({ url }) => {
+startStandaloneServer(server, {
+  listen: { host: "0.0.0.0", port },
+}).then(({ url }) => {
   console.log(`🚀 madrox-graphql ready at ${url}`);
 });

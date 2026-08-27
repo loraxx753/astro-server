@@ -1,8 +1,0 @@
-# swisseph is a native addon. Railway's Python 3.13 has no distutils,
-# which old node-gyp still imports. setuptools restores it.
-# Use npm (package-lock.json) so Yarn is not selected because of yarn.lock.
-[phases.setup]
-aptPkgs = ["python3-setuptools", "build-essential"]
-
-[phases.install]
-cmds = ["npm ci"]

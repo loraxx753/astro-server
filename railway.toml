@@ -1,0 +1,4 @@
+# Force the Dockerfile so Railpack's Python 3.13 is not used to compile swisseph.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"

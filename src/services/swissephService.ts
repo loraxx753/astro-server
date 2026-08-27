@@ -39,13 +39,15 @@ export async function getSwissEphHouses(
     latitude: number,
     longitude: number
 ): Promise<any> {
-  return swisseph.swe_houses(
-      jd,
-      latitude,
-      longitude,
-      "P",
-      (res: any) => res
-  );
+  const result = swisseph.swe_houses(jd, latitude, longitude, 'P');
+  if ('error' in result) {
+    throw new Error(result.error);
+  }
+  return {
+    ...result,
+    // JS binding already maps C cusps[1..12] onto a 12-length array.
+    house: result.house.slice(0, 12),
+  };
 }
 
 export async function getPlacidusCusps(

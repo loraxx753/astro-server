@@ -3,12 +3,9 @@ import { getHorizonsBirthChartPositions } from './services/horizonsService.js';
 import { geocodeLocation } from './services/geocoding.js';
 import { reverseGeocode } from './services/geocoding.js';
 import { getSwissEphHouses} from './services/swissephService.js';
-// import { printCuspComparison } from './services/calculate/houses.js';
-import swisseph from 'swisseph';
-import tzLookup from 'tz-lookup';
-import { DateTime } from 'luxon';
-import { convertToZodiac, getZodiacFromLongitude } from './services/calculate/astrology.js';
+import { getZodiacFromLongitude } from './services/calculate/astrology.js';
 import { getSwissEphPlanetPositions } from './services/swissephService.js';
+import { julianDayFromLocalBirth } from './services/birthDateTime.js';
 
 // Type interfaces
 interface GeocodingResult {
@@ -116,16 +113,7 @@ export const resolvers = {
       }
     },
     async housePositions(_: any, { date, time, latitude, longitude }: { date: string; time: string; latitude: number; longitude: number; }) {
-      const timezone = tzLookup(latitude, longitude);
-      const localDateTime = DateTime.fromFormat(`${date} ${time}`, 'yyyy-MM-dd HH:mm', { zone: timezone });
-      const utcDateTime = localDateTime.toUTC();
-      const jd = swisseph.swe_julday(
-        utcDateTime.year,
-        utcDateTime.month,
-        utcDateTime.day,
-        utcDateTime.hour + utcDateTime.minute / 60 + utcDateTime.second / 3600,
-        swisseph.SE_GREG_CAL
-      );
+      const { jd } = julianDayFromLocalBirth(date, time, latitude, longitude);
       return await getSwissEphHouses(jd, latitude, longitude);
     },
 async reading(_: any, { uid, name, date, time, latitude, longitude, city, region, country }: { uid: string; name: string; date: string; time: string; latitude?: number; longitude?: number; city?: string; region?: string; country?: string; }) {
@@ -141,21 +129,12 @@ async reading(_: any, { uid, name, date, time, latitude, longitude, city, region
     country = result.country;
   }
   
-  const timezone = tzLookup(latitude, longitude);
-  const localDateTime = DateTime.fromFormat(`${date} ${time}`, 'yyyy-MM-dd HH:mm', { zone: timezone });
-  const utcDateTime = localDateTime.toUTC();
-  const jd = swisseph.swe_julday(
-    utcDateTime.year,
-    utcDateTime.month,
-    utcDateTime.day,
-    utcDateTime.hour + utcDateTime.minute / 60 + utcDateTime.second / 3600,
-    swisseph.SE_GREG_CAL
-  );
+  const { jd, timezone, local, utc } = julianDayFromLocalBirth(date, time, latitude!, longitude!);
 
   console.log('Reading requested with:', { uid, name, date, time, latitude, longitude, city, region, country });
   console.log('Computed timezone:', timezone);
-  console.log('Local DateTime:', localDateTime.toISO());
-  console.log('UTC DateTime:', utcDateTime.toISO());
+  console.log('Local DateTime:', local.toISO());
+  console.log('UTC DateTime:', utc.toISO());
   console.log('Julian Day:', jd);
 
   const housesResult = await resolvers.Query.housePositions({}, { date, time, latitude: latitude!, longitude: longitude! });
@@ -194,7 +173,7 @@ const celestialBodyPositions = Object.values(planets).map((planet: any) => {
     dec: 0,
     longitude: planet.longitude,
     latitude: planet.latitude,
-    dateStr: utcDateTime.toISO(),
+    dateStr: utc.toISO(),
     northNodeLongitude: null,
     southNodeLongitude: null
   };

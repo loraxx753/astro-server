@@ -9,7 +9,7 @@
     "build": "tsc",
     "serve": "node dist/index.js",
     "test": "tsx .\\test-accuracy.mjs",
-    "test:houses": "tsx .\\test-houses.mjs"
+    "test:houses": "tsx .\\test-houses-golden.mjs"
   },
   "dependencies": {
     "@apollo/server": "^5.0.0",

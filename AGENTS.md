@@ -5,7 +5,6 @@ Scope: this file applies to all work under astrology/astro-server/.
 ## Repo Identity
 - Canonical role: astrology GraphQL backend.
 - Stack: Node.js + TypeScript + Apollo GraphQL.
-- Parallel architecture target: `ML/viz/backend`.
 
 ## Fast Start
 - Install: `npm install`
@@ -18,6 +17,13 @@ Scope: this file applies to all work under astrology/astro-server/.
 - Schema merge point: `src/schemas/typeDefs.ts`.
 - Resolver orchestration: `src/resolvers.ts`.
 - Domain logic lives in `src/services/`.
+
+## Jira
+- Site: https://macovin.atlassian.net
+- Project: Shimmering Stars (`SS`)
+- Default issue type: Task
+- Create and update tickets in `SS` unless the user names another project.
+- Pair frontend work with `shimmering-stars` under the same `SS` project.
 
 ## Conventions That Matter
 - Keep resolvers thin and push business logic into services.

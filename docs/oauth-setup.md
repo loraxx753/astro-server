@@ -29,7 +29,7 @@ Paste the output into `JWT_SECRET` (local `.env` and Railway). Do not commit it.
 3. **Network Access**: add `0.0.0.0/0` so Railway and your laptop can connect. Tighten this later if you want.
 4. **Database** → **Connect** → **Drivers** → copy the `mongodb+srv://...` URI.
 5. Replace `<password>` and set a database name (for example `/shimmering-stars`).
-6. Put the URI in `MONGODB_URI`.
+6. Put the connection string in `MONGO_URL` (Railway's Mongo variable name).
 
 Users land in a `users` collection after the first successful sign-in.
 
@@ -78,7 +78,7 @@ Put that Client ID / secret in **Railway** variables.
 Copy `.env.example` and fill:
 
 ```
-MONGODB_URI=mongodb+srv://...
+MONGO_URL=mongodb+srv://...
 JWT_SECRET=...
 OAUTH_REDIRECT_URI=http://localhost:5173/signin/callback
 GOOGLE_CLIENT_ID=...
@@ -99,7 +99,7 @@ On the `astro-server` service, set:
 
 | Variable | Production value |
 | --- | --- |
-| `MONGODB_URI` | Atlas URI |
+| `MONGO_URL` | Atlas / Railway Mongo URL |
 | `JWT_SECRET` | Same generator as step 1 (can differ from local) |
 | `OAUTH_REDIRECT_URI` | `https://shimmeringstars.org/signin/callback` |
 | `GOOGLE_CLIENT_ID` | Same Google Web client as local |
@@ -119,6 +119,6 @@ Redeploy after saving variables.
 
 If Google/GitHub says redirect_uri mismatch, the console callback URL does not match `OAUTH_REDIRECT_URI` and the browser URL.
 
-If exchange fails with `MONGODB_URI is not set`, step 2/5 is incomplete.
+If exchange fails with `MONGO_URL is not set`, step 2/5 is incomplete.
 
 Charts (`planetaryPositions` / `housePositions`) stay public and do not require a session.

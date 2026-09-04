@@ -18,6 +18,7 @@ Scope: this file applies to all work under astrology/astro-server/.
 - Resolver orchestration: `src/resolvers.ts`.
 - Domain logic lives in `src/services/`.
 - OAuth human setup: [docs/oauth-setup.md](docs/oauth-setup.md)
+- Sentry (API errors): [docs/sentry-setup.md](docs/sentry-setup.md)
 
 ## Jira
 - Site: https://macovin.atlassian.net

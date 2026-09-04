@@ -1,3 +1,5 @@
+import { flushSentry } from "./instrument.js";
+import * as Sentry from "@sentry/node";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import net from "node:net";
@@ -5,19 +7,15 @@ import { createContext, type GraphQLContext } from "./context.js";
 import typeDefs from "./schemas/typeDefs.js";
 import { resolvers } from "./resolvers.js";
 
-try {
-  process.loadEnvFile();
-} catch {
-  // Railway and other hosts inject env vars; a local .env is optional.
-}
-
 process.on("uncaughtException", (err) => {
   console.error("uncaughtException", err);
-  process.exit(1);
+  Sentry.captureException(err);
+  void flushSentry().finally(() => process.exit(1));
 });
 process.on("unhandledRejection", (err) => {
   console.error("unhandledRejection", err);
-  process.exit(1);
+  Sentry.captureException(err);
+  void flushSentry().finally(() => process.exit(1));
 });
 
 const parsedPort = Number(process.env.PORT);
@@ -54,5 +52,7 @@ try {
   console.log(`🚀 madrox-graphql ready at ${url}`);
 } catch (err) {
   console.error("Failed to start GraphQL server:", err);
+  Sentry.captureException(err);
+  await flushSentry();
   process.exit(1);
 }

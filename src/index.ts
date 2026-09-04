@@ -1,8 +1,15 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import net from "node:net";
+import { createContext, type GraphQLContext } from "./context.js";
 import typeDefs from "./schemas/typeDefs.js";
 import { resolvers } from "./resolvers.js";
+
+try {
+  process.loadEnvFile();
+} catch {
+  // Railway and other hosts inject env vars; a local .env is optional.
+}
 
 process.on("uncaughtException", (err) => {
   console.error("uncaughtException", err);
@@ -17,7 +24,7 @@ const parsedPort = Number(process.env.PORT);
 const port = Number.isFinite(parsedPort) && parsedPort > 0 ? parsedPort : 7004;
 const host = "0.0.0.0";
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer<GraphQLContext>({ typeDefs, resolvers });
 
 async function listenOnFallbackPort() {
   if (port === 7004) return;
@@ -41,6 +48,7 @@ try {
   console.log(`Starting GraphQL server on ${host}:${port}`);
   const { url } = await startStandaloneServer(server, {
     listen: { host, port },
+    context: async ({ req }) => createContext(req),
   });
   await listenOnFallbackPort();
   console.log(`🚀 madrox-graphql ready at ${url}`);

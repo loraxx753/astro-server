@@ -17,6 +17,7 @@ Scope: this file applies to all work under astrology/astro-server/.
 - Schema merge point: `src/schemas/typeDefs.ts`.
 - Resolver orchestration: `src/resolvers.ts`.
 - Domain logic lives in `src/services/`.
+- OAuth human setup: [docs/oauth-setup.md](docs/oauth-setup.md)
 
 ## Jira
 - Site: https://macovin.atlassian.net

@@ -1,0 +1,31 @@
+enum AuthProvider {
+  GOOGLE
+  GITHUB
+}
+
+type User {
+  id: ID!
+  email: String
+  name: String
+  avatarUrl: String
+  provider: AuthProvider!
+}
+
+type AuthUrl {
+  url: String!
+  state: String!
+}
+
+type AuthSession {
+  token: String!
+  user: User!
+}
+
+type Query {
+  authUrl(provider: AuthProvider!): AuthUrl!
+  me: User
+}
+
+type Mutation {
+  exchangeOAuthCode(code: String!, state: String!): AuthSession!
+}

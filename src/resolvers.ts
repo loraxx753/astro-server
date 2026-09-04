@@ -1,4 +1,4 @@
-
+import { authResolvers } from './resolvers/auth.js';
 import { getHorizonsBirthChartPositions } from './services/horizonsService.js';
 import { geocodeLocation } from './services/geocoding.js';
 import { reverseGeocode } from './services/geocoding.js';
@@ -72,6 +72,7 @@ interface Reading {
 
 export const resolvers = {
   Query: {
+    ...authResolvers.Query,
     async latLongFromLocation(_: any, { city, country, region }: { city: string; country: string; region?: string }) {
       // Use geocodeLocation service, mapping region to state for compatibility
       try {
@@ -217,6 +218,7 @@ const celestialBodyPositions = Object.values(planets).map((planet: any) => {
   };
 }  },
   Mutation: {
+    ...authResolvers.Mutation,
     // async createClientChart(_: any, input: IClientChart) {
     //   const chart = new ClientCharts(input);
     //   await chart.save();

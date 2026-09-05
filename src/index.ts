@@ -1,5 +1,5 @@
-import { flushSentry } from "./instrument.js";
-import * as Sentry from "@sentry/node";
+import "./instrument.js";
+import { captureSentryException, flushSentry, sentryApolloPlugin } from "./instrument.js";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import net from "node:net";
@@ -9,12 +9,12 @@ import { resolvers } from "./resolvers.js";
 
 process.on("uncaughtException", (err) => {
   console.error("uncaughtException", err);
-  Sentry.captureException(err);
+  captureSentryException(err);
   void flushSentry().finally(() => process.exit(1));
 });
 process.on("unhandledRejection", (err) => {
   console.error("unhandledRejection", err);
-  Sentry.captureException(err);
+  captureSentryException(err);
   void flushSentry().finally(() => process.exit(1));
 });
 
@@ -22,7 +22,11 @@ const parsedPort = Number(process.env.PORT);
 const port = Number.isFinite(parsedPort) && parsedPort > 0 ? parsedPort : 7004;
 const host = "0.0.0.0";
 
-const server = new ApolloServer<GraphQLContext>({ typeDefs, resolvers });
+const server = new ApolloServer<GraphQLContext>({
+  typeDefs,
+  resolvers,
+  plugins: [sentryApolloPlugin],
+});
 
 async function listenOnFallbackPort() {
   if (port === 7004) return;
@@ -52,7 +56,7 @@ try {
   console.log(`🚀 madrox-graphql ready at ${url}`);
 } catch (err) {
   console.error("Failed to start GraphQL server:", err);
-  Sentry.captureException(err);
+  captureSentryException(err);
   await flushSentry();
   process.exit(1);
 }

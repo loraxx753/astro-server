@@ -26,6 +26,8 @@ Scope: this file applies to all work under astrology/astro-server/.
 - Default issue type: Task
 - Create and update tickets in `SS` unless the user names another project.
 - Pair frontend work with `shimmering-stars` under the same `SS` project.
+- Loop: create a ticket when the work starts, ship the feature, mark the ticket **Done**. Tracking is a byproduct of shipping, not a required ceremony before code.
+- Do not hold a feature open for extra tests or docs. File those as later housekeeping and close the feature ticket when behavior is on the branch.
 
 ## Conventions That Matter
 - Keep resolvers thin and push business logic into services.
@@ -36,3 +38,4 @@ Scope: this file applies to all work under astrology/astro-server/.
 - Validate resolver/schema changes against frontend query usage when possible.
 - Keep test commands non-interactive.
 - Keep changes surgical and avoid unrelated refactors.
+- When a feature ships, transition its SS ticket to Done and leave a short comment of what landed.

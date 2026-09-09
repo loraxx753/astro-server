@@ -1,12 +1,12 @@
-scalar JSON
-
 type ClientChart {
   id: ID!
   name: String!
   birthDate: String!
   birthTime: String!
-  location: BirthLocation!
-  chartData: JSON!
+  location: Location!
+  houseSystem: String
+  gender: String
+  notes: String
   createdAt: String!
 }
 
@@ -39,8 +39,8 @@ type HousePositionsResult {
 }
 
 type Query {
-  birthChart(uid: ID!): ClientChart
-  birthCharts: [ClientChart!]
+  birthChart(id: ID!): ClientChart
+  birthCharts: [ClientChart!]!
   planetaryPositions(date: String!, time: String!, latitude: Float, longitude: Float, city: String, region: String, country: String): [CelestialBodyPosition!]!
   latLongFromLocation(city: String!, country: String!, region: String): LatLongResult!
   locationFromLatLong(latitude: Float!, longitude: Float!): BirthLocation!
@@ -74,7 +74,9 @@ type Mutation {
     birthDate: String!
     birthTime: String!
     location: LocationInput!
-    chartData: JSON!
+    houseSystem: String
+    gender: String
+    notes: String
   ): ClientChart
   deleteClientChart(id: ID!): ClientChart
 }

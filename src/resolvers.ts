@@ -1,4 +1,5 @@
 import { authResolvers } from './resolvers/auth.js';
+import type { GraphQLContext } from './context.js';
 import { getHorizonsBirthChartPositions } from './services/horizonsService.js';
 import { geocodeLocation } from './services/geocoding.js';
 import { reverseGeocode } from './services/geocoding.js';
@@ -6,6 +7,13 @@ import { getSwissEphHouses} from './services/swissephService.js';
 import { getZodiacFromLongitude } from './services/calculate/astrology.js';
 import { getSwissEphPlanetPositions } from './services/swissephService.js';
 import { julianDayFromLocalBirth } from './services/birthDateTime.js';
+import {
+  createClientChart as createClientChartForUser,
+  deleteClientChart as deleteClientChartForUser,
+  getClientChart as getClientChartForUser,
+  listClientCharts,
+  type CreateClientChartInput,
+} from './services/charts/index.js';
 
 // Type interfaces
 interface GeocodingResult {
@@ -73,6 +81,12 @@ interface Reading {
 export const resolvers = {
   Query: {
     ...authResolvers.Query,
+    birthChart(_: unknown, { id }: { id: string }, ctx: GraphQLContext) {
+      return getClientChartForUser(ctx.userId, id);
+    },
+    birthCharts(_: unknown, __: unknown, ctx: GraphQLContext) {
+      return listClientCharts(ctx.userId);
+    },
     async latLongFromLocation(_: any, { city, country, region }: { city: string; country: string; region?: string }) {
       // Use geocodeLocation service, mapping region to state for compatibility
       try {
@@ -219,13 +233,15 @@ const celestialBodyPositions = Object.values(planets).map((planet: any) => {
 }  },
   Mutation: {
     ...authResolvers.Mutation,
-    // async createClientChart(_: any, input: IClientChart) {
-    //   const chart = new ClientCharts(input);
-    //   await chart.save();
-    //   return chart;
-    // },
-    // async deleteClientChart(_: any, { id }: { id: string }) {
-    //   return await ClientCharts.findByIdAndDelete(id);
-    // },
+    createClientChart(
+      _: unknown,
+      input: CreateClientChartInput,
+      ctx: GraphQLContext
+    ) {
+      return createClientChartForUser(ctx.userId, input);
+    },
+    deleteClientChart(_: unknown, { id }: { id: string }, ctx: GraphQLContext) {
+      return deleteClientChartForUser(ctx.userId, id);
+    },
   },
 };

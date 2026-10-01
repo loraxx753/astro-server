@@ -1,4 +1,4 @@
-# Force the Dockerfile so Railpack's Python 3.13 is not used to compile swisseph.
+# Build from the Dockerfile so the Node version is pinned to 26.
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"

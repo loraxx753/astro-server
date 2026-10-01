@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import tzLookup from 'tz-lookup';
-import swisseph from 'swisseph';
+import sweph from 'sweph';
 
 const BIRTH_DATETIME_FORMATS = ['yyyy-MM-dd HH:mm:ss', 'yyyy-MM-dd HH:mm'] as const;
 
@@ -26,12 +26,12 @@ export function julianDayFromLocalBirth(
   const timezone = tzLookup(latitude, longitude);
   const local = parseLocalBirthDateTime(date, time, timezone);
   const utc = local.toUTC();
-  const jd = swisseph.swe_julday(
+  const jd = sweph.julday(
     utc.year,
     utc.month,
     utc.day,
     utc.hour + utc.minute / 60 + utc.second / 3600,
-    swisseph.SE_GREG_CAL
+    sweph.constants.SE_GREG_CAL
   );
   return { jd, timezone, local, utc };
 }

@@ -1,5 +1,7 @@
-import swisseph from "swisseph";
+import sweph from "sweph";
 import * as positions from "../lib/constants/SwissEphemerisObjectIds.js";
+
+const { constants } = sweph;
 
 export function getSwissEphPlanetPositions(jd: number) {
   const results: Record<string, any> = {};
@@ -7,18 +9,20 @@ export function getSwissEphPlanetPositions(jd: number) {
   Object.entries(positions.planets).forEach(([name, id]) => {
     if (name === "earth") return;
 
-    const res = swisseph.swe_calc_ut(
+    const res = sweph.calc_ut(
       jd,
       id,
-      swisseph.SEFLG_SWIEPH | swisseph.SEFLG_SPEED
+      constants.SEFLG_SWIEPH | constants.SEFLG_SPEED
     );
 
-    if ("longitude" in res) {
+    // A non-negative flag with an error string is just the Moshier fallback warning.
+    if (res.flag !== constants.ERR) {
+      const [longitude, latitude, , longitudeSpeed] = res.data;
       results[name] = {
         name: name.charAt(0).toUpperCase() + name.slice(1),
-        longitude: res.longitude,
-        latitude: res.latitude,
-        speed: res.longitudeSpeed,
+        longitude,
+        latitude,
+        speed: longitudeSpeed,
       };
     }
   });
@@ -31,13 +35,29 @@ export async function getSwissEphHouses(
   latitude: number,
   longitude: number
 ): Promise<any> {
-  const result = swisseph.swe_houses(jd, latitude, longitude, "P");
-  if ("error" in result) {
-    throw new Error(result.error);
+  const result = sweph.houses(jd, latitude, longitude, "P");
+  if (result.flag !== constants.OK) {
+    throw new Error("Can't calculate houses.");
   }
+  const [
+    ascendant,
+    mc,
+    armc,
+    vertex,
+    equatorialAscendant,
+    kochCoAscendant,
+    munkaseyCoAscendant,
+    munkaseyPolarAscendant,
+  ] = result.data.points;
   return {
-    ...result,
-    // JS binding already maps C cusps[1..12] onto a 12-length array.
-    house: result.house.slice(0, 12),
+    house: result.data.houses.slice(0, 12),
+    ascendant,
+    mc,
+    armc,
+    vertex,
+    equatorialAscendant,
+    kochCoAscendant,
+    munkaseyCoAscendant,
+    munkaseyPolarAscendant,
   };
 }
